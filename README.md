@@ -209,4 +209,4 @@ This is a passion project born from a love of retro tech and the lost art of DVD
 
 There are no promises of ongoing support, bug fixes, or feature updates; life’s short, and time is limited. That said, I’m always happy to collaborate. If you spot issues, have ideas, or want to contribute, open an issue or PR and we’ll see where it goes.
 
-Enjoy experimenting. Long live the disc. 📀
+Enjoy experimenting. Long love the disc. 📀
