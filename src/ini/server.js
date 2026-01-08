@@ -231,54 +231,71 @@ app.get("/", (_req, res) => {
 
     <fieldset>
       <legend>Inputs</legend>
-      <label>Source</label>
-      <div class="row" style="grid-template-columns: 1fr 1fr; align-items: center;">
-        <label style="font-weight: 400;"><input type="radio" name="source" id="sourceUpload" value="upload" checked /> Upload files</label>
-        <label style="font-weight: 400;"><input type="radio" name="source" id="sourcePaths" value="paths" /> Use existing VPS paths</label>
-      </div>
+      <div class="muted">Paths must be under <code>/media</code> as seen from inside the container.</div>
 
-      <div id="uploadInputs">
       <label>Video</label>
-      <input id="video" type="file" accept="video/*" />
+      <div class="row" style="grid-template-columns: 1fr 1fr; align-items: center;">
+        <label style="font-weight: 400;"><input type="radio" name="videoSource" value="upload" checked /> Upload file</label>
+        <label style="font-weight: 400;"><input type="radio" name="videoSource" value="paths" /> Use existing VPS path</label>
+      </div>
+      <div id="videoUploadWrap">
+        <input id="video" type="file" accept="video/*" />
+      </div>
+      <div id="videoPathWrap" style="display:none;">
+        <input id="videoPath" type="text" placeholder="/media/wp-uploads/2025/09/movie.mp4" />
+      </div>
 
       <label>Menu background image</label>
-      <input id="still" type="file" accept="image/*" />
+      <div class="row" style="grid-template-columns: 1fr 1fr; align-items: center;">
+        <label style="font-weight: 400;"><input type="radio" name="stillSource" value="upload" checked /> Upload file</label>
+        <label style="font-weight: 400;"><input type="radio" name="stillSource" value="paths" /> Use existing VPS path</label>
+      </div>
+      <div id="stillUploadWrap">
+        <input id="still" type="file" accept="image/*" />
+      </div>
+      <div id="stillPathWrap" style="display:none;">
+        <input id="stillPath" type="text" placeholder="/media/wp-uploads/2025/12/background.jpg" />
+      </div>
 
       <label>Intro video (optional)</label>
-      <input id="intro" type="file" accept="video/*" />
+      <div class="row" style="grid-template-columns: 1fr 1fr; align-items: center;">
+        <label style="font-weight: 400;"><input type="radio" name="introSource" value="upload" checked /> Upload file</label>
+        <label style="font-weight: 400;"><input type="radio" name="introSource" value="paths" /> Use existing VPS path</label>
+      </div>
+      <div id="introUploadWrap">
+        <input id="intro" type="file" accept="video/*" />
+      </div>
+      <div id="introPathWrap" style="display:none;">
+        <input id="introPath" type="text" placeholder="/media/wp-uploads/2025/12/intro.mp4" />
+      </div>
 
-      <label>Audio tracks (select multiple)</label>
-      <input id="audios" type="file" accept="audio/*" multiple />
-      <div class="muted">Language codes aligned to selected audio order, e.g. <code>en,es,fr</code></div>
+      <label>Audio tracks</label>
+      <div class="row" style="grid-template-columns: 1fr 1fr; align-items: center;">
+        <label style="font-weight: 400;"><input type="radio" name="audioSource" value="upload" checked /> Upload files</label>
+        <label style="font-weight: 400;"><input type="radio" name="audioSource" value="paths" /> Use existing VPS paths</label>
+      </div>
+      <div id="audioUploadWrap">
+        <input id="audios" type="file" accept="audio/*" multiple />
+      </div>
+      <div id="audioPathWrap" style="display:none;">
+        <textarea id="audioPaths" style="width:100%; padding:10px;" rows="4" placeholder="/media/wp-uploads/2025/12/english.wav&#10;/media/wp-uploads/2025/12/polish.wav"></textarea>
+      </div>
+      <div class="muted">Language codes aligned to audio order, e.g. <code>en,es,fr</code></div>
       <input id="audioLanguages" type="text" placeholder="en,es,fr" />
 
-      <label>Subtitle files (optional, select multiple)</label>
-      <input id="subtitles" type="file" accept=".srt,.ass,.ssa,.vtt,text/plain" multiple />
-      <div class="muted">Language codes aligned to selected subtitle order, e.g. <code>en,es,fr</code></div>
+      <label>Subtitle files (optional)</label>
+      <div class="row" style="grid-template-columns: 1fr 1fr; align-items: center;">
+        <label style="font-weight: 400;"><input type="radio" name="subtitleSource" value="upload" checked /> Upload files</label>
+        <label style="font-weight: 400;"><input type="radio" name="subtitleSource" value="paths" /> Use existing VPS paths</label>
+      </div>
+      <div id="subtitleUploadWrap">
+        <input id="subtitles" type="file" accept=".srt,.ass,.ssa,.vtt,text/plain" multiple />
+      </div>
+      <div id="subtitlePathWrap" style="display:none;">
+        <textarea id="subtitlePaths" style="width:100%; padding:10px;" rows="3" placeholder="/media/wp-uploads/2025/12/en.srt&#10;/media/wp-uploads/2025/12/pl.srt"></textarea>
+      </div>
+      <div class="muted">Language codes aligned to subtitle order, e.g. <code>en,es,fr</code></div>
       <input id="subtitleLanguages" type="text" placeholder="en,es,fr" />
-      </div>
-
-      <div id="pathInputs" style="display:none;">
-        <div class="muted">Provide paths under <code>/media</code> as seen from inside the container (absolute or relative).</div>
-        <label>Video path</label>
-        <input id="videoPath" type="text" placeholder="/media/uploads/movie.mp4 or uploads/movie.mp4" />
-
-        <label>Menu image path</label>
-        <input id="stillPath" type="text" placeholder="/media/uploads/background.jpg or uploads/background.jpg" />
-
-        <label>Intro path (optional)</label>
-        <input id="introPath" type="text" placeholder="/media/uploads/intro.mp4" />
-
-        <label>Audio paths (one per line)</label>
-        <textarea id="audioPaths" style="width:100%; padding:10px;" rows="4" placeholder="/media/uploads/en.wav&#10;/media/uploads/es.wav"></textarea>
-        <div class="muted">Language codes aligned to audio order, e.g. <code>en,es,fr</code></div>
-        <input id="audioLanguagesPaths" type="text" placeholder="en,es,fr" />
-
-        <label>Subtitle paths (optional, one per line)</label>
-        <textarea id="subtitlePaths" style="width:100%; padding:10px;" rows="3" placeholder="/media/uploads/en.srt&#10;/media/uploads/es.srt"></textarea>
-        <div class="muted">Language codes aligned to subtitle order, e.g. <code>en,es,fr</code></div>
-        <input id="subtitleLanguagesPaths" type="text" placeholder="en,es,fr" />
-      </div>
       <div class="row">
         <div>
           <label>Burn subtitles into video</label>
@@ -374,80 +391,106 @@ app.get("/", (_req, res) => {
 
         const token = document.getElementById("token").value || "";
 
-        const usePaths = document.getElementById("sourcePaths").checked;
+        const getRadioValue = (name) => {
+          const el = document.querySelector('input[name="' + name + '"]:checked');
+          return el ? el.value : "upload";
+        };
 
-        let res;
-        if (!usePaths) {
+        const videoSource = getRadioValue("videoSource");
+        const stillSource = getRadioValue("stillSource");
+        const introSource = getRadioValue("introSource");
+        const audioSource = getRadioValue("audioSource");
+        const subtitleSource = getRadioValue("subtitleSource");
+
+        const form = new FormData();
+
+        if (videoSource === "upload") {
           const video = document.getElementById("video").files[0];
-          const still = document.getElementById("still").files[0];
-          const intro = document.getElementById("intro").files[0] || null;
-          const audios = Array.from(document.getElementById("audios").files || []);
-          const subtitles = Array.from(document.getElementById("subtitles").files || []);
-
-          if (!video || !still || audios.length === 0) {
-            statusEl.textContent = "Missing required files (video, still, at least 1 audio).";
+          if (!video) {
+            statusEl.textContent = "Missing required video file.";
             return;
           }
-
-          const form = new FormData();
           form.append("video", video);
-          form.append("still", still);
-          if (intro) form.append("intro", intro);
-          audios.forEach(a => form.append("audios", a));
-          subtitles.forEach(s => form.append("subtitles", s));
-
-          form.append("format", document.getElementById("format").value);
-          form.append("volumeName", document.getElementById("volumeName").value);
-          form.append("twoPass", document.getElementById("twoPass").value);
-          form.append("audioLanguages", document.getElementById("audioLanguages").value);
-          form.append("subtitleLanguages", document.getElementById("subtitleLanguages").value);
-          form.append("subtitleBurnIn", document.getElementById("subtitleBurnIn").value);
-          if (token) form.append("token", token);
-
-          res = await fetch("/api/jobs", {
-            method: "POST",
-            body: form,
-            headers: token ? { "x-api-token": token } : {},
-          });
         } else {
           const videoPath = document.getElementById("videoPath").value;
-          const stillPath = document.getElementById("stillPath").value;
-          const introPath = document.getElementById("introPath").value;
-          const audioPaths = document.getElementById("audioPaths").value;
-          const subtitlePaths = document.getElementById("subtitlePaths").value;
-
-          const audioLines = audioPaths.split("\\n").map(v => v.trim()).filter(Boolean);
-          const subtitleLines = subtitlePaths.split("\\n").map(v => v.trim()).filter(Boolean);
-
-          if (!videoPath || !stillPath || audioLines.length === 0) {
-            statusEl.textContent = "Missing required paths (video, still, at least 1 audio).";
+          if (!videoPath) {
+            statusEl.textContent = "Missing required video path.";
             return;
           }
-
-          const payload = {
-            videoPath,
-            stillPath,
-            introPath,
-            audioPaths: audioLines,
-            subtitlePaths: subtitleLines,
-            format: document.getElementById("format").value,
-            volumeName: document.getElementById("volumeName").value,
-            twoPass: document.getElementById("twoPass").value,
-            audioLanguages: document.getElementById("audioLanguagesPaths").value,
-            subtitleLanguages: document.getElementById("subtitleLanguagesPaths").value,
-            subtitleBurnIn: document.getElementById("subtitleBurnIn").value,
-          };
-          if (token) payload.token = token;
-
-          res = await fetch("/api/jobs/from-paths", {
-            method: "POST",
-            headers: {
-              "content-type": "application/json",
-              ...(token ? { "x-api-token": token } : {}),
-            },
-            body: JSON.stringify(payload),
-          });
+          form.append("videoPath", videoPath);
         }
+
+        if (stillSource === "upload") {
+          const still = document.getElementById("still").files[0];
+          if (!still) {
+            statusEl.textContent = "Missing required menu image file.";
+            return;
+          }
+          form.append("still", still);
+        } else {
+          const stillPath = document.getElementById("stillPath").value;
+          if (!stillPath) {
+            statusEl.textContent = "Missing required menu image path.";
+            return;
+          }
+          form.append("stillPath", stillPath);
+        }
+
+        if (introSource === "upload") {
+          const intro = document.getElementById("intro").files[0] || null;
+          if (intro) form.append("intro", intro);
+        } else {
+          const introPath = document.getElementById("introPath").value;
+          if (introPath) form.append("introPath", introPath);
+        }
+
+        if (audioSource === "upload") {
+          const audios = Array.from(document.getElementById("audios").files || []);
+          if (audios.length === 0) {
+            statusEl.textContent = "Missing required audio track(s).";
+            return;
+          }
+          audios.forEach((a) => form.append("audios", a));
+        } else {
+          const audioPaths = document.getElementById("audioPaths").value || "";
+          const audioLines = audioPaths
+            .split(/\\r?\\n/)
+            .map((v) => v.trim())
+            .filter(Boolean);
+          if (audioLines.length === 0) {
+            statusEl.textContent = "Missing required audio path(s).";
+            return;
+          }
+          form.append("audioPaths", audioLines.join("\\n"));
+        }
+
+        if (subtitleSource === "upload") {
+          const subtitles = Array.from(document.getElementById("subtitles").files || []);
+          subtitles.forEach((s) => form.append("subtitles", s));
+        } else {
+          const subtitlePaths = document.getElementById("subtitlePaths").value || "";
+          const subtitleLines = subtitlePaths
+            .split(/\\r?\\n/)
+            .map((v) => v.trim())
+            .filter(Boolean);
+          if (subtitleLines.length > 0) {
+            form.append("subtitlePaths", subtitleLines.join("\\n"));
+          }
+        }
+
+        form.append("format", document.getElementById("format").value);
+        form.append("volumeName", document.getElementById("volumeName").value);
+        form.append("twoPass", document.getElementById("twoPass").value);
+        form.append("audioLanguages", document.getElementById("audioLanguages").value);
+        form.append("subtitleLanguages", document.getElementById("subtitleLanguages").value);
+        form.append("subtitleBurnIn", document.getElementById("subtitleBurnIn").value);
+        if (token) form.append("token", token);
+
+        const res = await fetch("/api/jobs", {
+          method: "POST",
+          body: form,
+          headers: token ? { "x-api-token": token } : {},
+        });
 
         if (!res.ok) {
           const err = await res.json().catch(() => ({}));
@@ -462,14 +505,23 @@ app.get("/", (_req, res) => {
         pollStatus(activeJobId, token);
       });
 
-      const syncInputs = () => {
-        const usePaths = document.getElementById("sourcePaths").checked;
-        document.getElementById("uploadInputs").style.display = usePaths ? "none" : "block";
-        document.getElementById("pathInputs").style.display = usePaths ? "block" : "none";
+      const bindToggle = (name, uploadWrapId, pathWrapId) => {
+        const sync = () => {
+          const value = document.querySelector('input[name="' + name + '"]:checked')?.value || "upload";
+          document.getElementById(uploadWrapId).style.display = value === "upload" ? "block" : "none";
+          document.getElementById(pathWrapId).style.display = value === "paths" ? "block" : "none";
+        };
+        document.querySelectorAll('input[name="' + name + '"]').forEach((el) => {
+          el.addEventListener("change", sync);
+        });
+        sync();
       };
-      document.getElementById("sourceUpload").addEventListener("change", syncInputs);
-      document.getElementById("sourcePaths").addEventListener("change", syncInputs);
-      syncInputs();
+
+      bindToggle("videoSource", "videoUploadWrap", "videoPathWrap");
+      bindToggle("stillSource", "stillUploadWrap", "stillPathWrap");
+      bindToggle("introSource", "introUploadWrap", "introPathWrap");
+      bindToggle("audioSource", "audioUploadWrap", "audioPathWrap");
+      bindToggle("subtitleSource", "subtitleUploadWrap", "subtitlePathWrap");
     </script>
   </body>
 </html>`);
@@ -573,42 +625,76 @@ app.post(
     const introFile = files.intro?.[0];
     const subtitleFiles = (files.subtitles || []).length > 0 ? files.subtitles : files.subtitle || [];
 
-    if (!videoFile || !stillFile || audioFiles.length === 0) {
-      return res.status(400).json({
-        error: "Missing required files: video, still, audios",
-      });
-    }
-
     const format = (req.body.format || "pal").toLowerCase() === "ntsc" ? "ntsc" : "pal";
     const volumeName = String(req.body.volumeName || "DVD_VIDEO").slice(0, 32);
     const twoPass = String(req.body.twoPass || "true") === "true";
     const subtitleBurnIn = String(req.body.subtitleBurnIn || "false") === "true";
 
-    const audioLanguages = String(req.body.audioLanguages || "")
-      .split(",")
+    const audioLanguageCodes = parseCsv(req.body.audioLanguages);
+    const subtitleLanguageCodes = parseCsv(req.body.subtitleLanguages);
+
+    const audioPathLines = String(req.body.audioPaths || "")
+      .split(/\r?\n/)
       .map((v) => v.trim())
       .filter(Boolean);
 
-    const audioTracks = audioFiles.map((f, index) => ({
-      path: f.path,
-      lang: audioLanguages[index] || "en",
-    }));
-
-    const subtitleLanguages = String(req.body.subtitleLanguages || "")
-      .split(",")
+    const subtitlePathLines = String(req.body.subtitlePaths || "")
+      .split(/\r?\n/)
       .map((v) => v.trim())
       .filter(Boolean);
 
-    const subtitleTracks = subtitleFiles.map((f, index) => ({
+    const video = videoFile
+      ? videoFile.path
+      : await accessReadable(req.body.videoPath, "video");
+
+    const still = stillFile
+      ? stillFile.path
+      : await accessReadable(req.body.stillPath, "still image");
+
+    const intro = introFile
+      ? introFile.path
+      : await accessReadable(req.body.introPath, "intro");
+
+    const audioTracksFromUploads = audioFiles.map((f, index) => ({
       path: f.path,
-      lang: subtitleLanguages[index] || "en",
+      lang: audioLanguageCodes[index] || "en",
     }));
+
+    const audioTracksFromPaths = await Promise.all(
+      audioPathLines.map(async (p, index) => ({
+        path: await accessReadable(p, `audio track ${audioTracksFromUploads.length + index + 1}`),
+        lang: audioLanguageCodes[audioTracksFromUploads.length + index] || "en",
+      }))
+    );
+
+    const audioTracks = [...audioTracksFromUploads, ...audioTracksFromPaths];
+
+    const subtitleTracksFromUploads = subtitleFiles.map((f, index) => ({
+      path: f.path,
+      lang: subtitleLanguageCodes[index] || "en",
+    }));
+
+    const subtitleTracksFromPaths = await Promise.all(
+      subtitlePathLines.map(async (p, index) => ({
+        path: await accessReadable(p, `subtitle track ${subtitleTracksFromUploads.length + index + 1}`),
+        lang: subtitleLanguageCodes[subtitleTracksFromUploads.length + index] || "en",
+      }))
+    );
+
+    const subtitleTracks = [...subtitleTracksFromUploads, ...subtitleTracksFromPaths];
+
+    if (!video || !still || audioTracks.length === 0) {
+      return res.status(400).json({
+        error:
+          "Missing required inputs: provide video (file or videoPath), still (file or stillPath), and at least 1 audio (files or audioPaths).",
+      });
+    }
 
     enqueueAuthorJob({
       jobId,
-      video: videoFile.path,
-      still: stillFile.path,
-      intro: introFile ? introFile.path : "",
+      video,
+      still,
+      intro,
       audioTracks,
       subtitleTracks,
       format,
