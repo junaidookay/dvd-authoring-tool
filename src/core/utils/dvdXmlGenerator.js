@@ -12,6 +12,23 @@ export const generateDvdXml = (context) => {
   const blackPath = context.int.blackPath;
   const introPath = context.int.introPath;
   let chapters = context.media.chapters ?? [];
+  const audioTracks = Array.isArray(context.args.audioTracks)
+    ? context.args.audioTracks
+    : [{ lang: "en" }];
+  const subtitleTracksRaw = Array.isArray(context.args.subtitleTracks)
+    ? context.args.subtitleTracks
+    : Array.isArray(context.args.subtitles)
+      ? context.args.subtitles.map((subtitlePath, index) => ({
+          path: subtitlePath,
+          lang: Array.isArray(context.args.subtitleLanguages)
+            ? context.args.subtitleLanguages[index]
+            : undefined,
+        }))
+      : typeof context.args.subtitle === "string" && context.args.subtitle.length > 0
+        ? [{ path: context.args.subtitle, lang: "en" }]
+        : [];
+  const subtitleTracks =
+    context.args.subtitleBurnIn === true ? [] : subtitleTracksRaw;
 
   // Apply NTSC timing adjustment if needed
   if (vStandard === "ntsc") {
@@ -41,6 +58,32 @@ export const generateDvdXml = (context) => {
   template = template.replace(
     "{{chapters}}",
     `0,${chapters.map((t) => t).join(",")}`
+  );
+  template = template.replace(
+    "{{titleAudioTags}}",
+    audioTracks
+      .map((track) => {
+        const lang =
+          typeof track.lang === "string" && track.lang.length > 0
+            ? track.lang
+            : "en";
+        return `      <audio lang="${lang}" content="normal"/>`;
+      })
+      .join("\n")
+  );
+  template = template.replace(
+    "{{titleSubpictureTags}}",
+    subtitleTracks.length > 0
+      ? subtitleTracks
+          .map((track) => {
+            const lang =
+              typeof track.lang === "string" && track.lang.length > 0
+                ? track.lang
+                : "en";
+            return `      <subpicture lang="${lang}"/>`;
+          })
+          .join("\n")
+      : ""
   );
 
   return template;

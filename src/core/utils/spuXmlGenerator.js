@@ -58,3 +58,46 @@ export const generateSpuXml = ({
 
   return formattedXml;
 };
+
+export const generateTextSubXml = ({
+  subtitlePath,
+  vStandard,
+  movieWidth = 720,
+  movieHeight,
+  aspect = "16:9",
+  characterSet = "UTF-8",
+}) => {
+  if (!subtitlePath) {
+    throw new Error("Missing required subtitlePath for textsub XML generation");
+  }
+
+  const verticalRes =
+    typeof movieHeight === "number" || typeof movieHeight === "string"
+      ? String(movieHeight)
+      : String((vStandard || "pal").toLowerCase() === "pal" ? 576 : 480);
+
+  const movieFps = (vStandard || "pal").toLowerCase() === "pal" ? "25" : "30000/1001";
+
+  const xml = `
+<subpictures>
+  <stream>
+    <textsub
+      filename="${subtitlePath}"
+      characterset="${characterSet}"
+      subtitle-fps="${movieFps}"
+      movie-fps="${movieFps}"
+      movie-width="${movieWidth}"
+      movie-height="${verticalRes}"
+      aspect="${aspect}"
+    />
+  </stream>
+</subpictures>
+`.trim();
+
+  return xmlFormat(xml, {
+    indentation: "  ",
+    filter: (node) => node.type !== "Comment",
+    collapseContent: true,
+    lineSeparator: "\n",
+  });
+};

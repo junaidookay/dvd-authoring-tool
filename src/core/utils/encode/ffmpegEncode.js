@@ -5,6 +5,8 @@ import ffmpegEncodeMain from "./ffmpegEncode-Main.js";
 import ffmpegEncodeMenu from "./ffmpegEncode-Menu.js";
 
 const ffmpegEncode = async (context) => {
+  const escapeForFfmpegFilter = (value) => value.replaceAll("'", "\\'");
+
   context.int["encode"] = {};
   const args = context.int.encode;
   args["vStandard"] = context.args.format.toLowerCase();
@@ -107,6 +109,22 @@ const ffmpegEncode = async (context) => {
     (stream) => stream.codec_type === "audio" && stream.channels === 2
   );
 
+  const burnInSubtitlePath =
+    typeof context.args.subtitle === "string"
+      ? context.args.subtitle
+      : Array.isArray(context.args.subtitle) && typeof context.args.subtitle[0] === "string"
+        ? context.args.subtitle[0]
+        : "";
+
+  const shouldBurnSubtitles =
+    context.com.enc.includes(".main") &&
+    context.args.subtitleBurnIn === true &&
+    burnInSubtitlePath.length > 0;
+
+  const subtitleFilter = shouldBurnSubtitles
+    ? `subtitles='${escapeForFfmpegFilter(burnInSubtitlePath)}'`
+    : null;
+
   if (context.com.enc.includes(".menu")) {
     args.vf.push(
       "-vf",
@@ -128,6 +146,7 @@ const ffmpegEncode = async (context) => {
         "format=yuv420p",
         `setfield=${args.fieldDominance}`,
         ...args.telecine,
+        ...(subtitleFilter ? [subtitleFilter] : []),
       ].join(",")
     );
   }

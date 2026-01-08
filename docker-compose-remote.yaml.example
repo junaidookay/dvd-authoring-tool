@@ -17,7 +17,7 @@ services:
       - CLIENT_URL=http://your-client-app:3000  # Replace with your client URL if applicable
     networks:
       - app-network
-    command: tail -f /dev/null
+    command: node /app/src/ini/server.js
   # Uncomment and configure if you have a client app (e.g., web interface)
   # dvd-web-client:
   #   image: dvd-web-client  # Replace with your client image

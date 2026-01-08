@@ -1,6 +1,8 @@
 services:
   dvd-author:
-    build: .
+    build:
+      context: .
+      dockerfile: dockerfile
     container_name: dvd-author
     volumes:
       # Mount your source code for real-time development
@@ -19,4 +21,4 @@ services:
     environment:
       - ENVTEST=true
       - ENV=dev
-    command: tail -f /dev/null
+    command: node /app/src/ini/server.js

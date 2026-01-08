@@ -113,7 +113,8 @@
     </menus>
     <titles>
       <video aspect="16:9" widescreen="nopanscan"/>
-      <audio lang="en" content="normal"/>
+      {{titleAudioTags}}
+      {{titleSubpictureTags}}
       <pgc>
         <vob file="{{moviePath}}" chapters="{{chapters}}" />
         <vob file="{{blackPath}}">

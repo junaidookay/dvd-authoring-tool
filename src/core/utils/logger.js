@@ -3,6 +3,7 @@ import { io } from "../../ini/socketInstance.js";
 class Logger {
   constructor() {
     this.activeSocket = null;
+    this.activeJobId = null;
     this.timers = {}; // Store custom timers
   }
 
@@ -10,25 +11,28 @@ class Logger {
     this.activeSocket = socket;
   }
 
+  setJobId(jobId) {
+    this.activeJobId = jobId;
+  }
+
   log(message, type = "info") {
     // Standard console output
     console.log(message);
 
+    const payload = {
+      message,
+      type,
+      timestamp: new Date().toISOString(),
+      ...(this.activeJobId ? { jobId: this.activeJobId } : {}),
+    };
+
     // Use a single broadcast mechanism for all connected sockets
     if (io) {
-      io.emit("output", {
-        message,
-        type,
-        timestamp: new Date().toISOString(),
-      });
+      io.emit("output", payload);
     }
     // Only use direct socket emission if io is unavailable
     else if (this.activeSocket) {
-      this.activeSocket.emit("output", {
-        message,
-        type,
-        timestamp: new Date().toISOString(),
-      });
+      this.activeSocket.emit("output", payload);
     }
   }
 
@@ -49,22 +53,20 @@ class Logger {
 
     console.log(progressMessage);
 
+    const payload = {
+      percent,
+      current,
+      total,
+      message,
+      ...(this.activeJobId ? { jobId: this.activeJobId } : {}),
+    };
+
     if (this.activeSocket) {
-      this.activeSocket.emit("progress", {
-        percent,
-        current,
-        total,
-        message,
-      });
+      this.activeSocket.emit("progress", payload);
     }
 
     if (io) {
-      io.emit("progress", {
-        percent,
-        current,
-        total,
-        message,
-      });
+      io.emit("progress", payload);
     }
   }
 

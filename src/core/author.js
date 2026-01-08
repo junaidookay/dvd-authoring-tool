@@ -15,6 +15,59 @@ import blackCreate from "./tasks/blackCreate.js";
 
 // Function that accepts parameters directly
 const author = async (options) => {
+  const normalizedOptions = { ...options };
+
+  if (Array.isArray(normalizedOptions.audio)) {
+    normalizedOptions.audios = normalizedOptions.audio;
+  }
+
+  if (typeof normalizedOptions.audios === "string") {
+    normalizedOptions.audios = [normalizedOptions.audios];
+  }
+
+  if (
+    !Array.isArray(normalizedOptions.audios) &&
+    typeof normalizedOptions.audio === "string"
+  ) {
+    normalizedOptions.audios = [normalizedOptions.audio];
+  }
+
+  if (
+    typeof normalizedOptions.audioLanguages === "string" &&
+    normalizedOptions.audioLanguages.length > 0
+  ) {
+    normalizedOptions.audioLanguages = normalizedOptions.audioLanguages
+      .split(",")
+      .map((v) => v.trim())
+      .filter(Boolean);
+  }
+
+  if (Array.isArray(normalizedOptions.subtitle)) {
+    normalizedOptions.subtitles = normalizedOptions.subtitle;
+  }
+
+  if (typeof normalizedOptions.subtitles === "string") {
+    normalizedOptions.subtitles = [normalizedOptions.subtitles];
+  }
+
+  if (
+    !Array.isArray(normalizedOptions.subtitles) &&
+    typeof normalizedOptions.subtitle === "string" &&
+    normalizedOptions.subtitle.length > 0
+  ) {
+    normalizedOptions.subtitles = [normalizedOptions.subtitle];
+  }
+
+  if (
+    typeof normalizedOptions.subtitleLanguages === "string" &&
+    normalizedOptions.subtitleLanguages.length > 0
+  ) {
+    normalizedOptions.subtitleLanguages = normalizedOptions.subtitleLanguages
+      .split(",")
+      .map((v) => v.trim())
+      .filter(Boolean);
+  }
+
   const context = {
     // args: operational options
     args: {
@@ -23,7 +76,7 @@ const author = async (options) => {
       debugWaitTime: 5,
       fullMux: true,
       twoPass: true,
-      ...options,
+      ...normalizedOptions,
     },
     // int: intermediate variables
     int: {},
@@ -96,8 +149,15 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     })
     .option("audio", {
       type: "string",
+      array: true,
       demandOption: true,
-      description: "Path to audio file",
+      description: "Path(s) to audio file(s)",
+    })
+    .option("audioLanguages", {
+      type: "string",
+      array: true,
+      default: [],
+      description: "Language codes for audio tracks (aligned to --audio)",
     })
     .option("still", {
       type: "string",
@@ -133,6 +193,23 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       type: "number",
       default: 0,
       description: "Optional audio offset in seconds",
+    })
+    .option("subtitle", {
+      type: "string",
+      array: true,
+      default: [],
+      description: "Path to subtitle file (optional, e.g. .srt)",
+    })
+    .option("subtitleLanguages", {
+      type: "string",
+      array: true,
+      default: [],
+      description: "Language codes for subtitle tracks (aligned to --subtitle)",
+    })
+    .option("subtitleBurnIn", {
+      type: "boolean",
+      default: false,
+      description: "Burn subtitles into the video (non-toggleable)",
     })
     .option("forceRebuild", {
       type: "boolean",

@@ -2,20 +2,38 @@ import path from "path";
 
 const contextVariables = (context) => {
   // Validate required arguments
-  const requiredArgs = [
-    "video",
-    "audio",
-    "still",
-    "intro",
-    "format",
-    "output",
-    "scratch",
-  ];
+  const requiredArgs = ["video", "still", "format", "output", "scratch"];
   for (const key of requiredArgs) {
     if (!context.args[key]) {
       throw new Error(`Missing required parameter: ${key}`);
     }
   }
+
+  if (typeof context.args.intro !== "string") {
+    context.args.intro = "";
+  }
+
+  const audioTracks = Array.isArray(context.args.audioTracks)
+    ? context.args.audioTracks
+    : Array.isArray(context.args.audios)
+      ? context.args.audios.map((audioPath, index) => ({
+          path: audioPath,
+          lang: Array.isArray(context.args.audioLanguages)
+            ? context.args.audioLanguages[index]
+            : undefined,
+        }))
+      : typeof context.args.audio === "string"
+        ? [{ path: context.args.audio }]
+        : [];
+
+  if (audioTracks.length === 0) {
+    throw new Error("Missing required parameter: audio");
+  }
+
+  context.args.audioTracks = audioTracks.map((track) => ({
+    path: track.path,
+    lang: typeof track.lang === "string" && track.lang.length > 0 ? track.lang : "en",
+  }));
 
   // Scratch path
   context.int["scratchDir"] = path.resolve(context.args.scratch);

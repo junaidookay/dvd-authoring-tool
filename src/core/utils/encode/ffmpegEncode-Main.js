@@ -34,13 +34,38 @@ const ffmpegEncodeMain = async (
   context,
   { incomingFrameRateChange, vStandard, forceKeyframes, vf, af }
 ) => {
-  // Common parameters
-  const commonParams = [
+  const audioTracks = Array.isArray(context.args.audioTracks)
+    ? context.args.audioTracks
+    : Array.isArray(context.args.audios)
+      ? context.args.audios.map((audioPath, index) => ({
+          path: audioPath,
+          lang: Array.isArray(context.args.audioLanguages)
+            ? context.args.audioLanguages[index]
+            : undefined,
+        }))
+      : typeof context.args.audio === "string"
+        ? [{ path: context.args.audio }]
+        : [];
+
+  if (audioTracks.length === 0) {
+    throw new Error("At least one audio track is required");
+  }
+
+  const normalizedAudioTracks = audioTracks.map((track) => ({
+    path: track.path,
+    lang: typeof track.lang === "string" && track.lang.length > 0 ? track.lang : "en",
+  }));
+
+  const firstPassInputs = [...incomingFrameRateChange, "-i", context.args.video];
+
+  const fullInputs = [
     ...incomingFrameRateChange,
     "-i",
     context.args.video,
-    "-i",
-    context.args.audio,
+    ...normalizedAudioTracks.flatMap((track) => ["-i", track.path]),
+  ];
+
+  const commonOutputParams = [
     "-target",
     `${vStandard}-dvd`,
     "-map",
@@ -55,9 +80,20 @@ const ffmpegEncodeMain = async (
     "+ildct+ilme",
   ];
 
+  const audioMapParams = normalizedAudioTracks.flatMap((_, index) => [
+    "-map",
+    `${index + 1}:a:0`,
+  ]);
+
+  const audioMetadataParams = normalizedAudioTracks.flatMap((track, index) => [
+    `-metadata:s:a:${index}`,
+    `language=${track.lang}`,
+  ]);
+
   if (context.args.twoPass) {
     const duration = context.media.video.duration;
-    const bitBudget = calculateVideoBitrate(duration, 224); // Assuming 224 kbps audio
+    const assumedAudioKbps = 224 * normalizedAudioTracks.length;
+    const bitBudget = calculateVideoBitrate(duration, assumedAudioKbps);
 
     logger.log(
       `Available capacity: ${bitBudget.availableCapacity} bytes, Audio total: ${
@@ -70,7 +106,8 @@ const ffmpegEncodeMain = async (
     );
     // First pass - analysis only
     const firstPassParams = [
-      ...commonParams,
+      ...firstPassInputs,
+      ...commonOutputParams,
       "-b:v",
       `${bitBudget.videoBitrateKbps}k`, // Target bitrate
       "-pass",
@@ -86,22 +123,23 @@ const ffmpegEncodeMain = async (
 
     // Second pass - actual encoding
     const secondPassParams = [
-      ...commonParams,
+      ...fullInputs,
+      ...commonOutputParams,
       "-b:v",
       `${bitBudget.videoBitrateKbps}k`, // Target bitrate
       "-pass",
       "2",
-      "-map",
-      "1:a:0",
+      ...audioMapParams,
       ...af,
       "-c:a",
       "ac3",
       "-b:a",
-      "192k",
+      "224k",
       "-ar",
       "48000",
       "-ac",
       "2",
+      ...audioMetadataParams,
       "-y",
       context.int.moviePath,
     ];
@@ -123,11 +161,11 @@ const ffmpegEncodeMain = async (
     ]);
   } else {
     const onePassParams = [
-      ...commonParams,
+      ...fullInputs,
+      ...commonOutputParams,
       "-q:v",
       "2",
-      "-map",
-      "1:a:0",
+      ...audioMapParams,
       ...af,
       "-c:a",
       "ac3",
@@ -137,6 +175,7 @@ const ffmpegEncodeMain = async (
       "48000",
       "-ac",
       "2",
+      ...audioMetadataParams,
       "-y",
       context.int.moviePath,
     ];

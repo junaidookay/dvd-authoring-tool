@@ -23,4 +23,4 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build Docker image
-      run: docker build -t dvd-author .
+      run: docker build -f dockerfile -t dvd-author .

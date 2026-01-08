@@ -33,5 +33,4 @@ COPY . .
 ENV ENVTEST=true
 ENV ENV=dev
 
-# Command to keep container running
-CMD ["tail", "-f", "/dev/null"]
+CMD ["node", "src/ini/server.js"]

@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "build-docker": "docker build -t dvd-author .",
+    "build-docker": "docker build -f dockerfile -t dvd-author .",
     "down": "docker compose down",
     "up": "docker compose up -d",
     "up-build": "docker compose up --build -d",
@@ -32,6 +32,7 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^5.1.0",
+    "multer": "^1.4.5-lts.1",
     "socket.io": "^4.8.1",
     "xml-formatter": "^3.6.6",
     "yargs": "^17.7.2"
